@@ -1,0 +1,37 @@
+apply plugin: 'java'
+
+repositories {
+  mavenCentral()
+}
+
+
+dependencies {
+  testCompile group: 'junit', name: 'junit', version: '4.+'
+  compile group: 'org.threadly', name: 'threadly', version: '0.2'
+}
+
+test {
+  testResultsDir = file("$buildDir/test-results/xml")
+}
+
+jar {
+  manifest {
+    attributes 'Implementation-Title': 'Threadly Examples'
+  }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
