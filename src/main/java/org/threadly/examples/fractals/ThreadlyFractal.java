@@ -60,7 +60,7 @@ public class ThreadlyFractal {
   }
   
   private static void updateImage() {
-    System.out.println("Updating image...Size: " + fractalWidth + "x" + fractalHeight + 
+    System.out.println("Generating image...Size: " + fractalWidth + "x" + fractalHeight + 
                          ", Position: " + yOffset + "x" + xOffset);
     
     int[] imageData = new int[windowWidth * windowHeight];
