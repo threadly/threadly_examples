@@ -77,7 +77,7 @@ public class ThreadlyFractal {
             // create a little background
             double a = Math.sqrt(x * (windowWidth / (double)fractalWidth));
             double b = Math.sqrt(f_y * (windowHeight / (double)fractalHeight));
-            result[index++] += (int) (a + b);
+            result[index++] += (int) Math.sqrt(a + b);
           }
           int percentDone = (int)((((double)f_y - yOffset) / windowHeight) * 100);
           // little extra check to avoid reporting multiple times due to int precision
