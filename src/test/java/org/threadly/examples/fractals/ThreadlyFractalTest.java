@@ -2,6 +2,7 @@ package org.threadly.examples.fractals;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.threadly.concurrent.CallableDistributor;
 import org.threadly.concurrent.PriorityScheduledExecutor;
@@ -19,7 +20,7 @@ import org.threadly.test.concurrent.TestablePriorityScheduler;
  * @author jent - Mike Jensen
  */
 public class ThreadlyFractalTest {
-  @Test
+  @Test @Ignore
   public void generateImageDataTest() {
     final int width = 20;
     final int height = 15;
