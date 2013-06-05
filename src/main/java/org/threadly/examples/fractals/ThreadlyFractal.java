@@ -21,8 +21,8 @@ import org.threadly.concurrent.VirtualRunnable;
 import org.threadly.util.ExceptionUtils;
 
 public class ThreadlyFractal {
-  private static final int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
-  private static final int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+  protected static final int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+  protected static final int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
   private static final PriorityScheduledExecutor scheduler;
   private static final CallableDistributor<Long, int[]> cd;
   
@@ -59,31 +59,28 @@ public class ThreadlyFractal {
     frame.setVisible(true);
   }
   
-  private static void updateImage() {
-    System.out.println("Generating image...Size: " + fractalWidth + "x" + fractalHeight + 
-                         ", Position: " + yOffset + "x" + xOffset);
-    
-    int[] imageData = new int[windowWidth * windowHeight];
-    for (long y = yOffset; y < windowHeight + yOffset; y++) {
+  protected static void submitCallables(CallableDistributor<Long, int[]> cd, 
+                                        final int width, final int height) {
+    for (long y = yOffset; y < height + yOffset; y++) {
       final long f_y = y;
       cd.submit(y, new Callable<int[]>() {
         @Override
         public int[] call() {
-          int[] result = new int[windowWidth];
+          int[] result = new int[width];
           int index = 0;
-          for (long x = xOffset; x < windowWidth + xOffset; x++) {
+          for (long x = xOffset; x < width + xOffset; x++) {
             result[index] = MandelbrotFractal.calculatePixel(x, f_y, fractalWidth, fractalHeight, 
                                                              0xFF000000);
             // create a little background
-            double a = Math.sqrt(x * (windowWidth / (double)fractalWidth));
-            double b = Math.sqrt(f_y * (windowHeight / (double)fractalHeight));
+            double a = Math.sqrt(x * (width / (double)fractalWidth));
+            double b = Math.sqrt(f_y * (height / (double)fractalHeight));
             result[index++] += (int) Math.sqrt(a + b);
           }
-          int percentDone = (int)((((double)f_y - yOffset) / windowHeight) * 100);
+          int percentDone = (int)((((double)f_y - yOffset) / height) * 100);
           // little extra check to avoid reporting multiple times due to int precision
-          if (percentDone != (int)((((double)f_y + 1 - yOffset) / windowHeight) * 100)) {
+          if (percentDone != (int)((((double)f_y + 1 - yOffset) / height) * 100)) {
             if (percentDone % 10 == 0) {
-              System.out.println(percentDone + " % done");
+              System.out.println(percentDone + "% done");
             }
           }
           
@@ -91,9 +88,13 @@ public class ThreadlyFractal {
         }
       });
     }
-
-    for (long y = yOffset; y < windowHeight + yOffset; y++) {
-      int indexStart = (int)(windowWidth * (y - yOffset));
+  }
+  
+  protected static int[] composeResults(CallableDistributor<Long, int[]> cd, 
+                                        int width, int height) {
+    int[] imageData = new int[width * height];
+    for (long y = yOffset; y < height + yOffset; y++) {
+      int indexStart = (int)(width * (y - yOffset));
       int[] result;
       try {
         result = cd.getNextResult(y).get();
@@ -105,6 +106,20 @@ public class ThreadlyFractal {
       System.arraycopy(result, 0, imageData, indexStart, result.length);
     }
     
+    return imageData;
+  }
+  
+  protected static int[] generateImageData(CallableDistributor<Long, int[]> cd, 
+                                           int width, int height) {
+    submitCallables(cd, width, height);
+    
+    return composeResults(cd, width, height);
+  }
+  
+  private static void updateImage() {
+    System.out.println("Generating image...Size: " + fractalWidth + "x" + fractalHeight + 
+                         ", Position: " + yOffset + "x" + xOffset);
+    int[] imageData = generateImageData(cd, windowWidth, windowHeight);
     System.out.println("Done generating fractal");
     
     image = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(windowWidth, windowHeight, 
