@@ -12,6 +12,13 @@ import java.util.concurrent.Future;
 
 import org.threadly.util.ExceptionUtils;
 
+/**
+ * A very simple and stupid implementation to test prime numbers.  It divides the work in parallel, 
+ * but just does a modulus on the number compared to every other odd number that is less than the 
+ * provided number.
+ * 
+ * @author jent - Mike Jensen
+ */
 public class DumbTester implements PrimeProcessor {
   private static final BigInteger TWO = BigInteger.ONE.add(BigInteger.ONE);
   
