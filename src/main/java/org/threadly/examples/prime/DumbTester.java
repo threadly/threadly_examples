@@ -42,7 +42,7 @@ public class DumbTester implements PrimeProcessor {
     }
     
     // quick check for even numbers
-    if (n.mod(TWO).intValue() == 0) {
+    if (n.mod(TWO).equals(BigInteger.ZERO)) {
       factor = TWO;
       return false;
     }
@@ -91,14 +91,14 @@ public class DumbTester implements PrimeProcessor {
                         BigInteger startVal, 
                         BigInteger endVal) {
       this.testVal = testVal;
-      if (startVal.mod(TWO).compareTo(BigInteger.ZERO) == 0) {
+      if (startVal.mod(TWO).equals(BigInteger.ZERO)) {
         startVal = startVal.add(BigInteger.ONE);
       }
-      if (startVal.compareTo(BigInteger.ONE) == 0) {
+      if (startVal.equals(BigInteger.ONE)) {
         startVal = startVal.add(TWO);
       }
       this.startVal = startVal;
-      if (endVal.compareTo(testVal) == 0) {
+      if (endVal.equals(testVal)) {
         endVal = endVal.subtract(BigInteger.ONE);
       }
       this.endVal = endVal;
@@ -109,7 +109,7 @@ public class DumbTester implements PrimeProcessor {
       for (BigInteger currentVal = startVal; 
            currentVal.compareTo(endVal) <= 0; 
            currentVal = currentVal.add(TWO)) {
-        if (testVal.mod(currentVal).doubleValue() == 0) {
+        if (testVal.mod(currentVal).equals(BigInteger.ZERO)) {
           return currentVal;
         }
       }
