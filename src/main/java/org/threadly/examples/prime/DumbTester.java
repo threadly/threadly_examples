@@ -105,12 +105,14 @@ public class DumbTester implements PrimeProcessor {
     }
     
     @Override
-    public BigInteger call() {
+    public BigInteger call() throws InterruptedException {
       for (BigInteger currentVal = startVal; 
            currentVal.compareTo(endVal) <= 0; 
            currentVal = currentVal.add(TWO)) {
         if (testVal.mod(currentVal).equals(BigInteger.ZERO)) {
           return currentVal;
+        } else if (Thread.interrupted()) {
+          throw new InterruptedException();
         }
       }
       
