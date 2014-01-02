@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import org.threadly.concurrent.CallableDistributor;
 import org.threadly.concurrent.PriorityScheduledExecutor;
 import org.threadly.concurrent.TaskPriority;
-import org.threadly.concurrent.VirtualRunnable;
 import org.threadly.util.ExceptionUtils;
 
 public class ThreadlyFractal {
@@ -171,7 +170,7 @@ public class ThreadlyFractal {
         final int endPointX = e.getPoint().x;
         final int endPointY = e.getPoint().y;
         
-        scheduler.execute(new VirtualRunnable() {
+        scheduler.execute(new Runnable() {
           @Override
           public void run() {
             // calculate selected distances based off total image size
