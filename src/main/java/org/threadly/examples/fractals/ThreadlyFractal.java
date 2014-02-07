@@ -11,27 +11,28 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.MemoryImageSource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
-import org.threadly.concurrent.CallableDistributor;
 import org.threadly.concurrent.PriorityScheduledExecutor;
 import org.threadly.concurrent.TaskPriority;
+import org.threadly.concurrent.future.ListenableFuture;
 import org.threadly.util.ExceptionUtils;
 
 public class ThreadlyFractal {
   protected static final int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
   protected static final int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
   private static final PriorityScheduledExecutor scheduler;
-  private static final CallableDistributor<Long, int[]> cd;
   
   static {
     int processors = Runtime.getRuntime().availableProcessors();
     scheduler = new PriorityScheduledExecutor(processors * 2, processors * 2, 
                                               1000, TaskPriority.High, 500);
-    cd = new CallableDistributor<Long, int[]>(processors * 2, scheduler);
   }
   
+  private static Map<Long, ListenableFuture<int[]>> futureMap = new HashMap<Long, ListenableFuture<int[]>>();
   private static Image image;
   private static long fractalWidth = windowWidth;
   private static long fractalHeight = windowHeight;
@@ -58,11 +59,10 @@ public class ThreadlyFractal {
     frame.setVisible(true);
   }
   
-  protected static void submitCallables(CallableDistributor<Long, int[]> cd, 
-                                        final int width, final int height) {
+  protected static void submitCallables(final int width, final int height) {
     for (long y = yOffset; y < height + yOffset; y++) {
       final long f_y = y;
-      cd.submit(y, new Callable<int[]>() {
+      futureMap.put(y, scheduler.submit(new Callable<int[]>() {
         @Override
         public int[] call() {
           int[] result = new int[width];
@@ -85,18 +85,17 @@ public class ThreadlyFractal {
           
           return result;
         }
-      });
+      }));
     }
   }
   
-  protected static int[] composeResults(CallableDistributor<Long, int[]> cd, 
-                                        int width, int height) {
+  protected static int[] composeResults(int width, int height) {
     int[] imageData = new int[width * height];
     for (long y = yOffset; y < height + yOffset; y++) {
       int indexStart = (int)(width * (y - yOffset));
       int[] result;
       try {
-        result = cd.getNextResult(y).get();
+        result = futureMap.get(y).get();
       } catch (ExecutionException e) {
         throw ExceptionUtils.makeRuntime(e);
       } catch (InterruptedException e) {
@@ -108,17 +107,16 @@ public class ThreadlyFractal {
     return imageData;
   }
   
-  protected static int[] generateImageData(CallableDistributor<Long, int[]> cd, 
-                                           int width, int height) {
-    submitCallables(cd, width, height);
+  protected static int[] generateImageData(int width, int height) {
+    submitCallables(width, height);
     
-    return composeResults(cd, width, height);
+    return composeResults(width, height);
   }
   
   private static void updateImage() {
     System.out.println("Generating image...Size: " + fractalWidth + "x" + fractalHeight + 
                          ", Position: " + yOffset + "x" + xOffset);
-    int[] imageData = generateImageData(cd, windowWidth, windowHeight);
+    int[] imageData = generateImageData(windowWidth, windowHeight);
     System.out.println("Done generating fractal");
     
     image = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(windowWidth, windowHeight, 
