@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
-import org.threadly.concurrent.PriorityScheduledExecutor;
+import org.threadly.concurrent.PriorityScheduler;
 import org.threadly.concurrent.TaskPriority;
 import org.threadly.concurrent.future.ListenableFuture;
 import org.threadly.util.ExceptionUtils;
@@ -24,12 +24,12 @@ import org.threadly.util.ExceptionUtils;
 public class ThreadlyFractal {
   protected static final int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
   protected static final int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
-  private static final PriorityScheduledExecutor scheduler;
+  private static final PriorityScheduler scheduler;
   
   static {
     int processors = Runtime.getRuntime().availableProcessors();
-    scheduler = new PriorityScheduledExecutor(processors * 2, processors * 2, 
-                                              1000, TaskPriority.High, 500);
+    scheduler = new PriorityScheduler(processors * 2, processors * 2, 
+                                      1000, TaskPriority.High, 500);
   }
   
   private static Map<Long, ListenableFuture<int[]>> futureMap = new HashMap<Long, ListenableFuture<int[]>>();

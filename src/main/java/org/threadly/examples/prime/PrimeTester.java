@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.threadly.concurrent.PriorityScheduledExecutor;
+import org.threadly.concurrent.PriorityScheduler;
 import org.threadly.util.ExceptionUtils;
 
 /**
@@ -27,8 +27,8 @@ public class PrimeTester {
     
     final int processingThreads = Runtime.getRuntime().availableProcessors() * 2;
     int threadPoolSize = processingThreads + args.length - 1;
-    final PriorityScheduledExecutor executor = new PriorityScheduledExecutor(processingThreads, threadPoolSize, 
-                                                                             Long.MAX_VALUE, true);
+    final PriorityScheduler executor = new PriorityScheduler(processingThreads, threadPoolSize, 
+                                                             Long.MAX_VALUE, true);
     executor.prestartAllCoreThreads();
     
     List<Future<?>> futures = new ArrayList<Future<?>>(args.length);
@@ -61,7 +61,7 @@ public class PrimeTester {
     }
   }
   
-  private static void testNumber(PriorityScheduledExecutor executor, 
+  private static void testNumber(PriorityScheduler executor, 
                                  int threadCount, String number) throws InterruptedException {
     // TODO - improve this with an AKS implementation
     PrimeProcessor primeProcessor = new DumbTester(new BigInteger(number));
