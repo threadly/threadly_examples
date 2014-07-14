@@ -13,8 +13,16 @@ dependencies {
   compile group: 'org.threadly', name: 'threadly', version: '2.2.0'
 }
 
+compileJava {
+  options.compilerArgs << "-Xlint:all" << "-Werror"
+}
+
+compileTestJava {
+  options.compilerArgs << "-Xlint:all" << "-Werror"
+}
+
 test {
-  testResultsDir = file("$buildDir/test-results/xml")
+  getReports().getJunitXml().setDestination(file("$buildDir/test-results/xml"))
 }
 
 jar {
