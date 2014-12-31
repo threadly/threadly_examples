@@ -11,12 +11,13 @@ import org.threadly.concurrent.PriorityScheduler;
 import org.threadly.util.ExceptionUtils;
 
 /**
- * Tester which takes a (ideally) very large number as an argument, 
- * and in parallel determines if it is prime or not.
+ * <p>Tester which takes a (ideally) very large number as an argument, and in parallel determines 
+ * if it is prime or not.</p>
  * 
  * @author jent - Mike Jensen
  */
 public class PrimeTester {
+  @SuppressWarnings("javadoc")
   public static void main(final String args[]) throws InterruptedException {
     if (args.length == 0) {
       System.err.println("No number to test provided");

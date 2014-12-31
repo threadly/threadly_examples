@@ -13,9 +13,9 @@ import java.util.concurrent.Future;
 import org.threadly.util.ExceptionUtils;
 
 /**
- * A very simple and stupid implementation to test prime numbers.  It divides the work in parallel, 
- * but just does a modulus on the number compared to every other odd number that is less than the 
- * provided number.
+ * <p>A very simple and stupid implementation to test prime numbers.  It divides the work in 
+ * parallel, but just does a modulus on the number compared to every other odd number that is less 
+ * than the provided number.</p>
  * 
  * @author jent - Mike Jensen
  */
@@ -25,6 +25,11 @@ public class DumbTester implements PrimeProcessor {
   private final BigInteger n;
   private BigInteger factor;
   
+  /**
+   * Constructs a tester with a very basic test algorithm.
+   * 
+   * @param n Number to test against
+   */
   public DumbTester(BigInteger n) {
     this.n = n;
     factor = null;

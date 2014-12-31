@@ -21,6 +21,7 @@ import org.threadly.concurrent.TaskPriority;
 import org.threadly.concurrent.future.ListenableFuture;
 import org.threadly.util.ExceptionUtils;
 
+@SuppressWarnings("javadoc")
 public class ThreadlyFractal {
   protected static final int windowWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
   protected static final int windowHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -39,7 +40,7 @@ public class ThreadlyFractal {
   private static long xOffset = 0;
   private static long yOffset = 0;
   
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     displayFractal();
   }
   

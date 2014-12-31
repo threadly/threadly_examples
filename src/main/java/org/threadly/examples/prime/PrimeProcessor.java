@@ -3,6 +3,9 @@ package org.threadly.examples.prime;
 import java.math.BigInteger;
 import java.util.concurrent.Executor;
 
+/**
+ * <p>Interface for an implementation which can check if a given value is prime.</p>
+ */
 public interface PrimeProcessor {
   /**
    * Does the calculation to see if a number is prime or not.  This returns a 

@@ -1,6 +1,22 @@
 package org.threadly.examples.fractals;
 
+/**
+ * <p>Algorithm which represents a Mandelbrot fractal.</p>
+ * 
+ * @author jent - Mike Jensen
+ */
 public class MandelbrotFractal {
+  /**
+   * Calculates the RGB of a pixel at a given position.
+   * 
+   * @param x X position
+   * @param y Y position
+   * @param width Image's total width
+   * @param height Image's total height
+   * @param offset color offset
+   * 
+   * @return RGB value for the given pixel
+   */
   public static int calculatePixel(long x, long y, long width, long height, int offset) {
     int result = offset;
     double x0 = -2 + (x / (width * 0.37));
