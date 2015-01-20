@@ -5,4 +5,4 @@ Examples of how to use the Threadly concurrency library.  These are designed to 
 
 Read more about threadly at: http://threadly.org
 
-Read more about how to use theses examples here: https://github.com/jentfoo/threadly/wiki/Examples-using-Threadly
+Read more about how to use theses examples here: https://github.com/threadly/threadly/wiki/Examples-using-Threadly
