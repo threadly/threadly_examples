@@ -28,9 +28,8 @@ public class PrimeTester {
     
     final int processingThreads = Runtime.getRuntime().availableProcessors() * 2;
     int threadPoolSize = processingThreads + args.length - 1;
-    final PriorityScheduler executor = new PriorityScheduler(processingThreads, threadPoolSize, 
-                                                             Long.MAX_VALUE, true);
-    executor.prestartAllCoreThreads();
+    final PriorityScheduler executor = new PriorityScheduler(threadPoolSize, true);
+    executor.prestartAllThreads();
     
     List<Future<?>> futures = new ArrayList<Future<?>>(args.length);
     

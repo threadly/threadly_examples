@@ -29,8 +29,7 @@ public class ThreadlyFractal {
   
   static {
     int processors = Runtime.getRuntime().availableProcessors();
-    scheduler = new PriorityScheduler(processors * 2, processors * 2, 
-                                      1000, TaskPriority.High, 500);
+    scheduler = new PriorityScheduler(processors * 2, TaskPriority.High, 500);
   }
   
   private static Map<Long, ListenableFuture<int[]>> futureMap = new HashMap<Long, ListenableFuture<int[]>>();
