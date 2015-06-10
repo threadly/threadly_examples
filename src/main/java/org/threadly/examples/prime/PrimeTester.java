@@ -2,12 +2,12 @@ package org.threadly.examples.prime;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.threadly.concurrent.PriorityScheduler;
+import org.threadly.concurrent.future.FutureUtils;
+import org.threadly.concurrent.future.ListenableFuture;
 import org.threadly.util.ExceptionUtils;
 
 /**
@@ -21,7 +21,7 @@ public class PrimeTester {
   public static void main(final String args[]) throws InterruptedException {
     if (args.length == 0) {
       System.err.println("No number to test provided");
-      System.err.println("Usage: java -cp Threadly_Examples.jar " + 
+      System.err.println("Usage: java -cp threadly_examples.jar " + 
                            PrimeTester.class.getName() + " [number to test]...");
       System.exit(1);
     }
@@ -31,7 +31,7 @@ public class PrimeTester {
     final PriorityScheduler executor = new PriorityScheduler(threadPoolSize, true);
     executor.prestartAllThreads();
     
-    List<Future<?>> futures = new ArrayList<Future<?>>(args.length);
+    List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>(args.length);
     
     for (int i = 0; i < args.length - 1; i++) {
       final int f_i = i;
@@ -51,13 +51,10 @@ public class PrimeTester {
     testNumber(executor, processingThreads, args[args.length - 1]);
     
     // verify all others finished
-    Iterator<Future<?>> it = futures.iterator();
-    while (it.hasNext()) {
-      try {
-        it.next().get();
-      } catch (ExecutionException e) {
-        throw ExceptionUtils.makeRuntime(e);
-      }
+    try {
+      FutureUtils.blockTillAllCompleteOrFirstError(futures);
+    } catch (ExecutionException e) {
+      throw ExceptionUtils.makeRuntime(e.getCause());
     }
   }
   

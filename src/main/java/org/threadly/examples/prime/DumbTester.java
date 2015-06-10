@@ -2,7 +2,6 @@ package org.threadly.examples.prime;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -10,6 +9,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 
+import org.threadly.concurrent.future.FutureUtils;
 import org.threadly.util.ExceptionUtils;
 
 /**
@@ -73,14 +73,11 @@ public class DumbTester implements PrimeProcessor {
       try {
         if (future.get() != null) {
           factor = future.get();
-          Iterator<Future<BigInteger>> it = futures.iterator();
-          while (it.hasNext()) {
-            it.next().cancel(true);
-          }
+          FutureUtils.cancelIncompleteFutures(futures, true);
           return false;
         }
       } catch (ExecutionException e) {
-        throw ExceptionUtils.makeRuntime(e);
+        throw ExceptionUtils.makeRuntime(e.getCause());
       }
     }
     
