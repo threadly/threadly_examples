@@ -112,11 +112,6 @@ public class PrioritySchedulerExample {
     private final int runNumber;
     
     /**
-     * the average execution time of the iterations
-     */
-    private double[] times;
-    
-    /**
      * the start time of the runnable
      */
     private final double startTime;
@@ -127,26 +122,19 @@ public class PrioritySchedulerExample {
      */
     public BasicRunnable(final int pRunNumber) {
       this.runNumber = pRunNumber;
-      this.times = new double[10];
       this.startTime = System.nanoTime();
     }
     
     @Override
     public void run() {
       for (int i = 0; i < 10; i++) {
-        
-        if (i == 0) {
-          times[i] = 0;
-        } else {
-          times[i] = System.nanoTime() - times[i-1];
-        }
-        System.out.print("Thread "
+        System.out.println("Thread "
                            + runNumber
                            + " is on iteration "
                            + (i+1)
                            + ". ");
       }
-      System.out.println("Thread " + runNumber + " took " + (startTime - System.nanoTime()) + " to execute." );
+      System.out.println("Thread " + runNumber + " took " + (System.nanoTime() - startTime) + "  nanoseconds to execute." );
     }
     
     
