@@ -42,7 +42,7 @@ public class PrioritySchedulerExample {
    for (int i = 0; i < numThreads; i++) {
      //random between 0-2 to determine priority.
      TaskPriority priority = getRandomPriority();
-     System.out.println("Submitting thread " + (i + 1) + " with priority " + priority.toString());
+     System.out.println("Submitting thread " + (i) + " with priority " + priority.toString());
      futures.add(executor.submit(new BasicRunnable(i), priority));
    }
    
@@ -131,7 +131,7 @@ public class PrioritySchedulerExample {
         System.out.println("Thread "
                            + runNumber
                            + " is on iteration "
-                           + (i+1)
+                           + (i)
                            + ". ");
       }
       System.out.println("Thread " + runNumber + " took " + (System.nanoTime() - startTime) + "  nanoseconds to execute." );
