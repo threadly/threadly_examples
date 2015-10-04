@@ -17,6 +17,8 @@ import org.threadly.concurrent.future.ListenableFuture;
  */
 public class PrioritySchedulerExample {
   
+  private static Boolean threadDetail = false;
+  
   /**
    * Main entry point of the example.
    * @param args -> program args. run w/o args for help
@@ -31,26 +33,28 @@ public class PrioritySchedulerExample {
     //create the PriorityScheduler. This is where we will make a method to handle the case of different
     //priorities!!!
     final PriorityScheduler executor = new PriorityScheduler(numThreads - 1, true);
-    //initialize all threads. threads will be idle until a task is provided
-    executor.prestartAllThreads();
     
     //create a list of ListenableFutures (java.util.concurrent.Future + the ability to listen for
     //completion of task) with the number of threads in the thread pool.
     List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>(numThreads - 1);
     
     //add numThreads - 1 tasks to the PriorityScheduler.
-   for (int i = 0; i < numThreads; i++) {
+   for (int i = 0; i <= numThreads; i++) {
      //random between 0-2 to determine priority.
      TaskPriority priority = getRandomPriority();
      System.out.println("Submitting thread " + (i) + " with priority " + priority.toString());
-     futures.add(executor.submit(new BasicRunnable(i), priority));
+     futures.add(executor.submit(new BasicRunnable(i, threadDetail), priority));
    }
+   /*
+    * Initialize the threads. This can be done BEFORE or AFTER submitting Runnables to the PriorityScheduler
+    * If done BEFORE:
+    *   Threads are created and are sitting idle. As soon as a task is submitted, an available thread will begin to work the task.
+    * If done AFTER:
+    *   Threads begin working on tasks immediately as they already have tasks.
+    */
+   executor.prestartAllThreads();
    
-   //run the numThreads-th task on the main thread so that it is blocking.
-   BasicRunnable runner = new BasicRunnable(numThreads);
-   runner.run();
-   
-   //check to make sure that all the threads have completed
+   //block until all threads are complete
    try {
      FutureUtils.blockTillAllCompleteOrFirstError(futures);
    } catch (Exception e) {
@@ -69,9 +73,19 @@ public class PrioritySchedulerExample {
     //handles the args, decides whether to call help and validates data in args
     try {
       Integer.parseInt(args[0]);
-      //Integer.parseInt(args[1]);
     } catch (NumberFormatException e) {
       printHelp();
+      return false;
+    } catch (IndexOutOfBoundsException e) {
+      printHelp();
+      return false;
+    }
+    try {
+      if (args[1].equalsIgnoreCase("-v")) {
+        PrioritySchedulerExample.threadDetail = true;
+      }
+    } catch (IndexOutOfBoundsException e) {
+      PrioritySchedulerExample.threadDetail = false;
     }
     return true;
   }
@@ -80,8 +94,10 @@ public class PrioritySchedulerExample {
    * Prints the information
    */
   public static void printHelp() {
-    System.out.println("format: java -cp org.threadly.examples.features.PrioritySchedulerExample numberOfThreads priorityValue");
-    System.out.println("\nPriority Values:");
+    System.out.println("Priority Scheduler Example executes a number of threads with a known, but randomly assigned. Each thread counts to the Max Integer Value before exiting.");
+    System.out.println("args: numThreads -> the integer numner of threads to be executed");
+    System.out.println("optional args: \"-v\" -> increases the amount of data reported by each thread and reduced the threads to counting to 100");
+    System.out.println("ex: PrioritySchedulerExample 1000 -v");
   }
   
   /**
@@ -117,22 +133,27 @@ public class PrioritySchedulerExample {
     private final double startTime;
     
     /**
+     * whether or not to display detail
+     */
+    private final Boolean detail;
+    
+    /**
      * Parameterized ctor. note: parameters are not required for a runnable to be executed by the PriorityScheduler.
      * @param pRunNumber -> the id number of the thread which thread will report to stdout
+     * @param pDetail -> whether or not to show verbose output (suppress for large number of threads for readability)
      */
-    public BasicRunnable(final int pRunNumber) {
+    public BasicRunnable(final int pRunNumber, final Boolean pDetail) {
       this.runNumber = pRunNumber;
       this.startTime = System.nanoTime();
+      this.detail = pDetail;
     }
     
     @Override
     public void run() {
-      for (int i = 0; i < 10; i++) {
-        System.out.println("Thread "
-                           + runNumber
-                           + " is on iteration "
-                           + (i)
-                           + ". ");
+      for (int i = 0; i < (detail ? 100 : Integer.MAX_VALUE); i++) {
+        if (detail) {
+          System.out.println("Thread " + runNumber + " is on iteration " + (i) + ". ");
+        }
       }
       System.out.println("Thread " + runNumber + " took " + (System.nanoTime() - startTime) + "  nanoseconds to execute." );
     }
