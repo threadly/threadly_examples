@@ -2,7 +2,9 @@ package org.threadly.examples.features;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import org.threadly.concurrent.future.FutureUtils;
 import org.threadly.concurrent.future.ListenableFuture;
 import org.threadly.concurrent.PriorityScheduler;
 import org.threadly.concurrent.TaskPriority;
@@ -15,6 +17,10 @@ import org.threadly.concurrent.TaskPriority;
  *
  */
 public final class PrioritySchedulerExample {
+  
+  /** static reference to the futures created */ 
+  private static List<ListenableFuture<?>> statFutures;
+  
   /**
    * Provided a PriorityScheduler that contains some basic ideas
    * @return -> the PriorityScheduler with tasks added
@@ -73,7 +79,19 @@ public final class PrioritySchedulerExample {
     for (int i = 0; i < numThreads - 3; i++) {
       futures.add(executor.submit(new HighPriorityTask(), TaskPriority.High));
     }
+    //assigning to the static references for use in other methods
+    statFutures = futures;
+    
+    
     return executor;
+  }
+  
+  /**
+   * gets the list of Listenable Futures to help with blocking. relies on getPriorityScheduler to be executed before this will return non-null
+   * @return -> a list of ListenableFutures, null if this has not been set
+   */
+  public static List<ListenableFuture<?>> getFutures() {
+    return statFutures;
   }
   
   /**
@@ -87,6 +105,26 @@ public final class PrioritySchedulerExample {
      * tasks have been submitted
      */
     executor.prestartAllThreads();
+    return executor;
+  }
+  
+  /**
+   * 
+   * @param executor -> a PriorityScheduler
+   * @param futures -> the list of ListenableFutures
+   * @return -> the same PriorityScheduler, but after tasks have been executed
+   */
+  public static PriorityScheduler startTasksBlocking(final PriorityScheduler executor, final List<ListenableFuture<?>> futures) {
+    executor.prestartAllThreads();
+    try {
+      FutureUtils.blockTillAllCompleteOrFirstError(futures);
+    } catch (InterruptedException e) {
+      //should handle the InterruptedExeception
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      //should handle the ExecutionException
+      e.printStackTrace();
+    }
     return executor;
   }
   
