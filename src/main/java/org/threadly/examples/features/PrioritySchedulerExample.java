@@ -23,39 +23,33 @@ public final class PrioritySchedulerExample {
   
   /**
    * Provided a PriorityScheduler that contains some basic ideas
+   * @param executor -> a PriorityScheduler instance
    * @return -> the PriorityScheduler with tasks added
    */
-  public static PriorityScheduler getPriorityScheduler() {
+  public static PriorityScheduler addTasksToPriorityScheduler(PriorityScheduler executor) {
     final int numThreads = Runtime.getRuntime().availableProcessors() * 2;
-    final PriorityScheduler executor = new PriorityScheduler(numThreads);
     List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>(numThreads);
     
-    futures.add(executor.submit(new Runnable() {
+    executor.scheduleWithFixedDelay(new Runnable() {
       
       @Override
       public void run() {
         /*
-         * This is the Starvable priority task that will be run.
-         * Starvable tasks run only when no other task needs to run
-         * It can be used to keep track of configuration:
-         * Example use case: closing sockets that no longer have hosts
-         * available on the other side.
+         * This is the task that will be run on a schedule.
+         * Example use case: A recurring task
          */
-        
       }
-    },
-    /*The priority of the task we are submitting*/TaskPriority.Starvable));
+    }, 0, 100000);
     
     futures.add(executor.submit(new Runnable() {
       
       @Override
       public void run() {
         /*
-         * This is the Low priority task that will be run.
-         * Low priority tasks are run before Starvable tasks,
-         * but exactly when it will be run is enforced by the 
-         * PrioritySchedulerService.
-         * Example use case: cache cleaning or other cleanup work
+         * This is a low priority task.
+         * Low priority is run before Starvable Priority tasks 
+         * and after High Priority tasks.
+         * Example: stats gathering for long running task
          */
         
       }
@@ -68,8 +62,8 @@ public final class PrioritySchedulerExample {
         /*
          * This is the High priority task that will be run.
          * High priority tasks are the highest priority in the thread pool.
-         * Example use case: Stats reporting about number of threads active in the pool
-         * and how many are queued.
+         * Example use case: Servicing requests for the application
+         * or doing processing that requires results as quickly as possible
          */
         
       } 
@@ -126,6 +120,19 @@ public final class PrioritySchedulerExample {
       e.printStackTrace();
     }
     return executor;
+  }
+  
+  /**
+   * prevents any future tasks from being submitted to the PriorityScheduler and does not run queued tasks
+   * @param executor -> the PriorityScheduler to operate on
+   * @param recurringStop -> whether or not to stop recurring tasks as well
+   */
+  public static void disposePrioritySchedulerTasks(final PriorityScheduler executor, boolean recurringStop) {
+    if (recurringStop) {
+      executor.shutdownNow();
+    } else {
+      executor.shutdownNow();
+    }
   }
   
   /**
