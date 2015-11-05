@@ -128,12 +128,11 @@ public final class PrioritySchedulerExample {
    * prevents any future tasks from being submitted to the PriorityScheduler
    * @param executor -> the PriorityScheduler to operate on
    * @param recurringStop -> whether or not to stop recurring tasks as well
-   * @param recurringTask -> the recurring task to remove if recurring stop is set, can be null
    */
-  public static void disposePrioritySchedulerTasks(final PriorityScheduler executor, boolean recurringStop, Runnable recurringTask) {
+  public void disposePrioritySchedulerTasks(final PriorityScheduler executor, boolean recurringStop) {
     if (recurringStop) {
-      if (recurringTask != null) {
-        executor.remove(recurringTask);
+      if (this.recurring != null) {
+        executor.remove(this.recurring);
       }
       executor.shutdown();
     } else {
