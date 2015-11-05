@@ -18,28 +18,30 @@ import org.threadly.concurrent.TaskPriority;
  */
 public final class PrioritySchedulerExample {
   
-  /** static reference to the futures created */ 
-  private static List<ListenableFuture<?>> statFutures;
+  private Runnable recurring = null;
+  
+  /** reference to the futures created */ 
+  private List<ListenableFuture<?>> statFutures;
   
   /**
    * Provided a PriorityScheduler that contains some basic ideas
    * @param executor -> a PriorityScheduler instance
    * @return -> the PriorityScheduler with tasks added
    */
-  public static PriorityScheduler addTasksToPriorityScheduler(PriorityScheduler executor) {
+  public PriorityScheduler addTasksToPriorityScheduler(PriorityScheduler executor) {
     final int numThreads = Runtime.getRuntime().availableProcessors() * 2;
     List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>(numThreads);
-    
-    executor.scheduleWithFixedDelay(new Runnable() {
-      
+    recurring = new Runnable() {
       @Override
       public void run() {
         /*
          * This is the task that will be run on a schedule.
-         * Example use case: A recurring task
+         * Example use case: regular cleanup/system maintenance task
          */
       }
-    }, 0, 100000);
+    };
+    //add a recurring task for execution at a fixed time interval
+    executor.scheduleWithFixedDelay(recurring, 0, 100000);
     
     futures.add(executor.submit(new Runnable() {
       
@@ -73,7 +75,7 @@ public final class PrioritySchedulerExample {
     for (int i = 0; i < numThreads - 3; i++) {
       futures.add(executor.submit(new HighPriorityTask(), TaskPriority.High));
     }
-    //assigning to the static references for use in other methods
+    //assigning to the references for use in other methods
     statFutures = futures;
     
     
@@ -84,7 +86,7 @@ public final class PrioritySchedulerExample {
    * gets the list of Listenable Futures to help with blocking. relies on getPriorityScheduler to be executed before this will return non-null
    * @return -> a list of ListenableFutures, null if this has not been set
    */
-  public static List<ListenableFuture<?>> getFutures() {
+  public List<ListenableFuture<?>> getFutures() {
     return statFutures;
   }
   
@@ -123,22 +125,26 @@ public final class PrioritySchedulerExample {
   }
   
   /**
-   * prevents any future tasks from being submitted to the PriorityScheduler and does not run queued tasks
+   * prevents any future tasks from being submitted to the PriorityScheduler
    * @param executor -> the PriorityScheduler to operate on
    * @param recurringStop -> whether or not to stop recurring tasks as well
+   * @param recurringTask -> the recurring task to remove if recurring stop is set, can be null
    */
-  public static void disposePrioritySchedulerTasks(final PriorityScheduler executor, boolean recurringStop) {
+  public static void disposePrioritySchedulerTasks(final PriorityScheduler executor, boolean recurringStop, Runnable recurringTask) {
     if (recurringStop) {
-      executor.shutdownNow();
+      if (recurringTask != null) {
+        executor.remove(recurringTask);
+      }
+      executor.shutdown();
     } else {
-      executor.shutdownNow();
+      executor.shutdown();
     }
   }
   
   /**
    * A basic runnable that can be reused
    */
-  private static class HighPriorityTask implements Runnable {
+  private class HighPriorityTask implements Runnable {
 
     @Override
     public void run() {
