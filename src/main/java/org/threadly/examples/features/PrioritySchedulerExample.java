@@ -14,19 +14,18 @@ import org.threadly.concurrent.TaskPriority;
  * Provides a basic example of the PriorityScheduler feature.
  * 
  * @author sreid8 - Sean Reid
- *
  */
 public final class PrioritySchedulerExample {
-  
   private Runnable recurring = null;
   
   /** reference to the futures created */ 
   private List<ListenableFuture<?>> statFutures;
   
   /**
-   * Provided a PriorityScheduler that contains some basic ideas
-   * @param executor -> a PriorityScheduler instance
-   * @return -> the PriorityScheduler with tasks added
+   * Provided a PriorityScheduler that contains some basic ideas.
+   * 
+   * @param executor a PriorityScheduler instance
+   * @return the PriorityScheduler with tasks added
    */
   public PriorityScheduler addTasksToPriorityScheduler(PriorityScheduler executor) {
     final int numThreads = Runtime.getRuntime().availableProcessors() * 2;
@@ -44,7 +43,6 @@ public final class PrioritySchedulerExample {
     executor.scheduleWithFixedDelay(recurring, 0, 100000);
     
     futures.add(executor.submit(new Runnable() {
-      
       @Override
       public void run() {
         /*
@@ -53,12 +51,10 @@ public final class PrioritySchedulerExample {
          * and after High Priority tasks.
          * Example: stats gathering for long running task
          */
-        
       }
     }, TaskPriority.Low));
     
     futures.add(executor.submit(new Runnable() {
-
       @Override
       public void run() {
         /*
@@ -67,7 +63,6 @@ public final class PrioritySchedulerExample {
          * Example use case: Servicing requests for the application
          * or doing processing that requires results as quickly as possible
          */
-        
       } 
      }, TaskPriority.High));
     
@@ -78,13 +73,14 @@ public final class PrioritySchedulerExample {
     //assigning to the references for use in other methods
     statFutures = futures;
     
-    
     return executor;
   }
   
   /**
-   * gets the list of Listenable Futures to help with blocking. relies on getPriorityScheduler to be executed before this will return non-null
-   * @return -> a list of ListenableFutures, null if this has not been set
+   * Gets the list of Listenable Futures to help with blocking. relies on getPriorityScheduler to 
+   * be executed before this will return non-null.
+   * 
+   * @return a list of ListenableFutures, null if this has not been set
    */
   public List<ListenableFuture<?>> getFutures() {
     return statFutures;
@@ -92,8 +88,8 @@ public final class PrioritySchedulerExample {
   
   /**
    * 
-   * @param executor -> a PriorityScheduler
-   * @return -> the same PriorityScheduler, but with the tasks started
+   * @param executor a PriorityScheduler
+   * @return the same PriorityScheduler, but with the tasks started
    */
   public static PriorityScheduler startTasks(final PriorityScheduler executor) {
     /*
@@ -106,9 +102,9 @@ public final class PrioritySchedulerExample {
   
   /**
    * 
-   * @param executor -> a PriorityScheduler
-   * @param futures -> the list of ListenableFutures
-   * @return -> the same PriorityScheduler, but after tasks have been executed
+   * @param executor a PriorityScheduler instance
+   * @param futures the list of ListenableFutures
+   * @return the same PriorityScheduler, but after tasks have been executed
    */
   public static PriorityScheduler startTasksBlocking(final PriorityScheduler executor, final List<ListenableFuture<?>> futures) {
     executor.prestartAllThreads();
@@ -125,9 +121,10 @@ public final class PrioritySchedulerExample {
   }
   
   /**
-   * prevents any future tasks from being submitted to the PriorityScheduler
-   * @param executor -> the PriorityScheduler to operate on
-   * @param recurringStop -> whether or not to stop recurring tasks as well
+   * prevents any future tasks from being submitted to the PriorityScheduler.
+   * 
+   * @param executor PriorityScheduler to operate on
+   * @param recurringStop whether or not to stop recurring tasks as well
    */
   public void disposePrioritySchedulerTasks(final PriorityScheduler executor, boolean recurringStop) {
     if (recurringStop) {
@@ -144,15 +141,12 @@ public final class PrioritySchedulerExample {
    * A basic runnable that can be reused
    */
   private class HighPriorityTask implements Runnable {
-
     @Override
     public void run() {
       /*
        * A high priority task would be here. Something similar to the other
        * High Priority task outlined above.
        */
-      
     }
-    
   }
 }
