@@ -1,0 +1,5 @@
+steps:
+  - command: "./gradlew clean build"
+    label: "build"
+    artifact_paths: "build/libs/*.jar"
+    timeout: 10
