@@ -9,8 +9,8 @@ repositories {
 
 
 dependencies {
-  testCompile group: 'junit', name: 'junit', version: '4.+'
-  compile group: 'org.threadly', name: 'threadly', version: '5.+'
+  testImplementation group: 'junit', name: 'junit', version: '4.+'
+  implementation group: 'org.threadly', name: 'threadly', version: '6.+'
 }
 
 compileJava {
@@ -29,7 +29,7 @@ jar {
   manifest {
     attributes 'Implementation-Title': 'Threadly Examples'
   }
-  from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  from configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
